@@ -1,0 +1,197 @@
+Program.Sub.ScreenSU.Start
+Gui.frmPrint..Create
+Gui.frmPrint..Caption("FG Inventory TAG")
+Gui.frmPrint..Size(3540,2325)
+Gui.frmPrint..MinX(0)
+Gui.frmPrint..MinY(0)
+Gui.frmPrint..Position(0,0)
+Gui.frmPrint..BackColor(-2147483633)
+Gui.frmPrint..MaxButton(False)
+Gui.frmPrint..MinButton(False)
+Gui.frmPrint..MousePointer(0)
+Gui.frmPrint..Event(UnLoad,Form_UnLoad)
+Gui.frmPrint.cmdPrint.Create(Button)
+Gui.frmPrint.cmdPrint.Size(855,375)
+Gui.frmPrint.cmdPrint.Position(120,1215)
+Gui.frmPrint.cmdPrint.Caption("&Print")
+Gui.frmPrint.cmdPrint.Event(Click,cmdPrint_Click)
+Gui.frmPrint.lbl1.Create(Label,"Job :",True,1935,255,0,120,210,True,0,"Arial",8,-2147483633,0)
+Gui.frmPrint.txtJob.Create(TextBox,"",True,1695,300,0,135,510,True,0,"Arial",8,-2147483643,1)
+Gui.frmPrint.txtJob.Locked(True)
+Gui.frmPrint.cmdBrowse.Create(Button)
+Gui.frmPrint.cmdBrowse.Size(480,330)
+Gui.frmPrint.cmdBrowse.Position(2715,495)
+Gui.frmPrint.cmdBrowse.Caption("^")
+Gui.frmPrint.cmdBrowse.Event(Click,cmdBrowse_Click)
+Gui.frmPrint.txtsuffix.Create(TextBox,"",True,750,300,0,1875,510,True,0,"Arial",8,-2147483643,1)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+variable.local.returnvalue.Declare(long)
+
+F.ODBC.Connection!con.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+'POST SAVE WIP FG
+f.Intrinsic.Control.If(v.Caller.Hook,=,16504)
+	Function.Intrinsic.UI.MsgBox("Print FG Inventory TAG ?", "Confirm", 4, variable.local.returnvalue)
+	F.Intrinsic.Control.If(variable.local.returnvalue,=,6)
+		f.Intrinsic.Control.CallSub(load_data,"Job",Variable.Passed.000003,"Suffix",Variable.Passed.000004)
+	f.Intrinsic.Control.EndIf 
+f.Intrinsic.Control.Else
+	gui.frmPrint..Show
+f.Intrinsic.Control.EndIf 
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4820_FGInvTAG.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+Program.Sub.Form_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!con.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4820_FGInvTAG.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Form_UnLoad.End
+
+Program.Sub.cmdPrint_Click.Start
+F.Intrinsic.Control.SetErrorHandler("Load_Data_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+f.Intrinsic.Control.If(v.Screen.frmPrint!txtJob.Text,=,"")
+	f.Intrinsic.UI.Msgbox("Please select WO")
+	gui.frmPrint.txtJob.SetFocus 
+f.Intrinsic.Control.ElseIf(v.Screen.frmPrint!txtsuffix.Text,=,"")
+	f.Intrinsic.UI.Msgbox("Please select Suffix")
+	gui.frmPrint.txtsuffix.SetFocus 
+f.Intrinsic.Control.Else
+	f.Intrinsic.Control.CallSub(load_data,"Job",v.Screen.frmPrint!txtJob.Text,"Suffix",v.Screen.frmPrint!txtSuffix.Text)
+f.Intrinsic.Control.EndIf 
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Load_Data_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4820_FGInvTAG.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdPrint_Click.End
+
+Program.Sub.cmdBrowse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("Load_Data_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+
+
+V.Local.sTitles.Declare(String)
+V.Local.sWidths.Declare(String)
+V.Global.sRet.Declare(String)
+V.Local.sSql.Declare(String)
+V.Local.sPart.Declare(String)
+Variable.Local.sRet.Declare(string)
+v.Local.bRet.declare(Boolean)
+Variable.Local.iWidths.Declare(long)
+
+
+Function.Intrinsic.UI.InvokeWaitDialog("Processing ...")
+
+
+F.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+
+
+
+
+ 
+Function.Intrinsic.String.Split("Job*!*Suffix*!*Part","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("1000*!*800*!*2000","*!*",variable.local.iWidths)
+Function.Intrinsic.UI.Browser("Select a job","con","select job,suffix,part from ITEM_HISTORY where code_transaction ='J52' order by  date_history desc",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+ Function.Intrinsic.UI.Msgbox("No job was selected!")
+Function.Intrinsic.Control.Else
+ Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+	gui.frmPrint.txtJob.Text(Variable.Local.sRet(0))
+	gui.frmPrint.txtSuffix.Text(Variable.Local.sRet(1))
+Function.Intrinsic.Control.EndIf
+
+Function.Intrinsic.UI.CloseWaitDialog 
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Load_Data_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4820_FGInvTAG.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdBrowse_Click.End
+
+Program.Sub.Load_Data.Start
+F.Intrinsic.Control.SetErrorHandler("Load_Data_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sSql.Declare(String)
+V.local.iBiRunID.Declare(long)
+V.local.iBILogID.Declare(long)
+V.Local.iRptid.Declare(long)
+
+	f.Intrinsic.String.Build("select job,suffix,part,heat,serial_number,quantity,userid,date_history from ITEM_HISTORY where code_transaction ='J52' and job = '{0}' and suffix = '{1}'",v.Args.Job,v.Args.Suffix,V.Local.sSql)
+	f.Data.DataTable.CreateFromSQL("DTTag","CON",v.Local.sSql)
+
+	F.Global.BI.GetRunID(V.local.iBIRunID)
+	F.Global.BI.GetIDFromName("GCG_4820_FGInvTAG.lab",V.Local.iRptid)
+	F.Global.BI.StartLogging(V.Local.iBIRunID,V.Local.iRptid,0,"",V.Local.iBILogID)
+
+	F.Global.BI.StopLogging(V.local.iBILogID)
+	
+	F.Global.BI.PrintCodesoftLabelFromDataTable(V.Local.iBIRunID,V.Local.iBILogID,"DTTag","",True)
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Load_Data_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4820_FGInvTAG.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Load_Data.End
+
+Program.Sub.Comments.Start
+${$0$}$GCG_4820_FGInvTAG$}$RAN$}$1/3/2018 2:01:47 PM$}$False
+Program.Sub.Comments.End
